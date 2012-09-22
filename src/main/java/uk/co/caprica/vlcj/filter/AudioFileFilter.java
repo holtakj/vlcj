@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with VLCJ.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Copyright 2009, 2010, 2011, 2012 Caprica Software Limited.
  */
 
@@ -29,6 +29,7 @@ public class AudioFileFilter extends ExtensionFileFilter {
      */
     private static final String[] EXTENSIONS_AUDIO = {
         "3ga",
+        "669",
         "a52",
         "aac",
         "ac3",
@@ -56,9 +57,13 @@ public class AudioFileFilter extends ExtensionFileFilter {
         "mp2",
         "mp3",
         "mpc",
+        "mpga",
         "oga",
         "ogg",
         "oma",
+        "opus",
+        "qcp",
+        "ra",
         "rmi",
         "s3m",
         "spx",

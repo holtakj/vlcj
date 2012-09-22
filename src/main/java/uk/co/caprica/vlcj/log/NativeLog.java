@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with VLCJ.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Copyright 2009, 2010, 2011, 2012 Caprica Software Limited.
  */
 
@@ -33,8 +33,6 @@ import uk.co.caprica.vlcj.binding.internal.libvlc_log_level_e;
 import uk.co.caprica.vlcj.binding.internal.libvlc_log_subscriber_t;
 import uk.co.caprica.vlcj.logger.Logger;
 
-import com.sun.jna.CallbackThreadInitializer;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
@@ -45,6 +43,8 @@ import com.sun.jna.Pointer;
  * <p>
  * The default log level is {@link libvlc_log_level_e#NOTICE}, this can be changed
  * by invoking {@link #setLevel(libvlc_log_level_e)}.
+ * <p>
+ * <strong>The native log requires vlc 2.1.0 or later.</strong>
  */
 public class NativeLog {
 
@@ -54,12 +54,12 @@ public class NativeLog {
      * Plus one for the null terminator.
      */
     private static final int BUFFER_SIZE = 200 + 1;
-    
+
     /**
      * List of registered event listeners.
      */
     private final List<LogEventListener> eventListenerList = new ArrayList<LogEventListener>();
-    
+
     /**
      * Background thread to send event notifications to listeners.
      * <p>
@@ -77,12 +77,12 @@ public class NativeLog {
      * Native log callback.
      */
     private libvlc_log_cb callback;
-    
+
     /**
      * Native log instance.
      */
     private libvlc_log_subscriber_t subscriberInstance;
-    
+
     /**
      * Set to true when the log has been released.
      */
@@ -97,7 +97,7 @@ public class NativeLog {
 
     /**
      * Create a new native log component.
-     * 
+     *
      * @param libvlc native library instance
      */
     public NativeLog(LibVlc libvlc) {
@@ -107,45 +107,45 @@ public class NativeLog {
 
     /**
      * Add a component to be notified of log messages.
-     * 
+     *
      * @param listener component to add
      */
     public final void addLogListener(LogEventListener listener) {
        Logger.debug("addLogListener(listener={})", listener);
        eventListenerList.add(listener);
     }
-    
+
     /**
      * Remove a component previously added so it is no longer notified of log messages.
-     * 
+     *
      * @param listener component to remove
      */
     public final void removeLogListener(LogEventListener listener) {
         Logger.debug("removeLogListener(listener={})", listener);
         eventListenerList.remove(listener);
     }
-    
+
     /**
      * Set the log threshold level.
      * <p>
      * Only log messages that are equal to or exceed this threshold are notified to
      * listeners.
-     * 
+     *
      * @param logLevel log threshold level
      */
     public final void setLevel(libvlc_log_level_e logLevel) {
         this.logLevel = logLevel;
     }
-    
+
     /**
      * Get the log threshold level.
-     * 
+     *
      * @return level
      */
     public final libvlc_log_level_e getLevel() {
         return logLevel;
     }
-    
+
     /**
      * Release the native log component.
      */
@@ -163,14 +163,11 @@ public class NativeLog {
         Logger.debug("createInstance()");
         // Create a native callback to receive log messages
         callback = new NativeLogCallback();
-        // Without this thread initialiser, many threads will be rapidly created (worst
-        // case is one thread per log message)
-        Native.setCallbackThreadInitializer(callback, new CallbackThreadInitializer());
         // Subscribe to the native log
         subscriberInstance = new libvlc_log_subscriber_t();
         libvlc.libvlc_log_subscribe(subscriberInstance, callback, null);
     }
-    
+
     /**
      * Destroy the native resources and shut down the log component.
      */
@@ -203,7 +200,7 @@ public class NativeLog {
         @Override
         public final void log(Pointer data, int level, String format, Pointer args) {
             // If the log is not being suppressed...
-            if(logLevel != null) {
+            if(logLevel != null && level >= logLevel.intValue()) {
                 // Allocate a new buffer to hold the formatted log message
                 ByteBuffer byteBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
                 // Delegate to the native library to format the log message
@@ -211,7 +208,7 @@ public class NativeLog {
                 // If the message was formatted without error...
                 if(size >= 0) {
                     // FIXME could reallocate a new buffer here and try again if size > capacity?
-                    
+
                     // Determine the number of available characters (actually number of bytes)
                     size = Math.min(size, BUFFER_SIZE);
                     // Create a new string from the byte buffer contents
@@ -219,12 +216,8 @@ public class NativeLog {
                     byteBuffer.get(bytes);
                     String message = new String(bytes);
                     if(message.length() > 0) {
-                        // If the log level of this message is greater than or equal to the 
-                        // current threshold...
-                        if(level >= logLevel.intValue()) {
-                            // ...send the event
-                            raiseLogEvent(libvlc_log_level_e.level(level), message);
-                        }
+                        // ...send the event
+                        raiseLogEvent(libvlc_log_level_e.level(level), message);
                     }
                 }
                 else {
@@ -235,8 +228,8 @@ public class NativeLog {
     }
 
     /**
-     * Raise a log event. 
-     * 
+     * Raise a log event.
+     *
      * @param level log level
      * @param message log message
      */
@@ -244,7 +237,7 @@ public class NativeLog {
         Logger.trace("raiseLogEvent(level={},message={}", level, message);
         // Submit a new log event so message are sent serially and asynchronously
         listenersService.submit(new NotifyEventListenersRunnable(level, message));
-        
+
     }
 
     /**
@@ -266,10 +259,10 @@ public class NativeLog {
          * Log message.
          */
         private final String message;
-        
+
         /**
          * Create a runnable.
-         * 
+         *
          * @param mediaPlayerEvent event to notify
          */
         private NotifyEventListenersRunnable(libvlc_log_level_e level, String message) {

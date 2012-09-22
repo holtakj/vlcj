@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with VLCJ.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Copyright 2009, 2010, 2011, 2012 Caprica Software Limited.
  */
 
@@ -87,12 +87,10 @@ public class LibXUtil {
      * This method should only be called on platforms where X is supported.
      * <p>
      * The implementation makes use of the JNA X11 platform binding.
-     * 
+     *
      * @param w window to make full-screen
-     * @param fullScreen <code>true</code> to make the window full-screen; <code>false</code> to
-     *            restore the window to it's original size and position
-     * @return <code>true</code> if the message was successfully sent to the window;
-     *         <code>false</code> otherwise
+     * @param fullScreen <code>true</code> to make the window full-screen; <code>false</code> to restore the window to it's original size and position
+     * @return <code>true</code> if the message was successfully sent to the window; <code>false</code> otherwise
      */
     public static boolean setFullScreenWindow(Window w, boolean fullScreen) {
         // Use the JNA platform X11 binding
@@ -115,7 +113,7 @@ public class LibXUtil {
 
     /**
      * Helper method to send a client message to an X window.
-     * 
+     *
      * @param display display
      * @param wid native window identifier
      * @param msg type of message to send

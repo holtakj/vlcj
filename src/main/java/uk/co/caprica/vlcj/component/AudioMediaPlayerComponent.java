@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with VLCJ.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Copyright 2009, 2010, 2011, 2012 Caprica Software Limited.
  */
 
@@ -45,17 +45,24 @@ import uk.co.caprica.vlcj.player.MediaPlayerFactory;
  * <p>
  * In this minimal example, only two lines of code are required to create an audio player and play
  * media:
- * 
+ *
  * <pre>
  * mediaPlayerComponent = new AudioMediaPlayerComponent(); // &lt;--- 1
  * mediaPlayerComponent.getMediaPlayer().playMedia(mrl); // &lt;--- 2
  * </pre>
- * 
+ *
  * This is not quite as useful as the {@link EmbeddedMediaPlayerComponent} as audio players are
  * generally quite simple to create anyway.
  * <p>
  * An audio player may still have a user interface, but it will not have an associated video
  * surface.
+ * <p>
+ * When the media player component is no longer needed, it should be released by invoking the
+ * {@link #release()} method.
+ * <p>
+ * Since the media player factory associated by this component may be created by this component
+ * itself or may be shared with some other media player resources it is the responsibility of
+ * the application to also release the media player factory at the appropriate time.
  */
 public class AudioMediaPlayerComponent extends MediaPlayerEventAdapter {
 
@@ -68,10 +75,10 @@ public class AudioMediaPlayerComponent extends MediaPlayerEventAdapter {
      * required.
      */
     protected static final String[] DEFAULT_FACTORY_ARGUMENTS = {
-        "--no-plugins-cache", 
-        "--quiet", 
-        "--quiet-synchro", 
-        "--intf", 
+        "--no-plugins-cache",
+        "--quiet",
+        "--quiet-synchro",
+        "--intf",
         "dummy"
     };
 
@@ -99,7 +106,7 @@ public class AudioMediaPlayerComponent extends MediaPlayerEventAdapter {
 
     /**
      * Get the media player factory reference.
-     * 
+     *
      * @return media player factory
      */
     public final MediaPlayerFactory getMediaPlayerFactory() {
@@ -110,7 +117,7 @@ public class AudioMediaPlayerComponent extends MediaPlayerEventAdapter {
      * Get the embedded media player reference.
      * <p>
      * An application uses this handle to control the media player, add listeners and so on.
-     * 
+     *
      * @return media player
      */
     public final MediaPlayer getMediaPlayer() {
@@ -119,11 +126,13 @@ public class AudioMediaPlayerComponent extends MediaPlayerEventAdapter {
 
     /**
      * Release the media player component and the associated native media player resources.
+     * <p>
+     * The associated media player factory will <em>not</em> be released, the client
+     * application is responsible for releasing the factory at the appropriate time.
      */
     public final void release() {
         onBeforeRelease();
         mediaPlayer.release();
-        mediaPlayerFactory.release();
         onAfterRelease();
     }
 
@@ -132,10 +141,7 @@ public class AudioMediaPlayerComponent extends MediaPlayerEventAdapter {
      * <p>
      * The default implementation will invoke the {@link #onGetMediaPlayerFactoryArgs()} template
      * method.
-     * <p>
-     * When this component is released via {@link #release()} the factory instance returned by this
-     * method will also be released.
-     * 
+     *
      * @return media player factory
      */
     protected MediaPlayerFactory onGetMediaPlayerFactory() {
@@ -148,7 +154,7 @@ public class AudioMediaPlayerComponent extends MediaPlayerEventAdapter {
      * <p>
      * If a sub-class overrides the {@link #onGetMediaPlayerFactory()} template method there is no
      * guarantee that {@link #onGetMediaPlayerFactoryArgs()} will be called.
-     * 
+     *
      * @return media player factory initialisation arguments
      */
     protected String[] onGetMediaPlayerFactoryArgs() {
@@ -160,7 +166,7 @@ public class AudioMediaPlayerComponent extends MediaPlayerEventAdapter {
      */
     protected void onAfterConstruct() {
     }
-    
+
     /**
      * Template method invoked immediately prior to releasing the media player and media player
      * factory instances.

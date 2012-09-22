@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with VLCJ.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Copyright 2009, 2010, 2011, 2012 Caprica Software Limited.
  */
 
@@ -36,7 +36,7 @@ public class NativeLogTest extends VlcjTest {
 
     /**
      * Application entry point.
-     * 
+     *
      * @param args command-line arguments
      * @throws Exception if an error occurs
      */
@@ -51,8 +51,13 @@ public class NativeLogTest extends VlcjTest {
         // This latch is used simply to cleanly exit the application when the
         // "finished" event is raised
         final CountDownLatch latch = new CountDownLatch(1);
-        
+
         NativeLog log = mediaPlayerComponent.getMediaPlayerFactory().newLog();
+        if (log == null) {
+            System.out.println("Native log not available on this platform");
+            System.exit(1);
+        }
+
         log.setLevel(libvlc_log_level_e.DEBUG);
         log.addLogListener(new LogEventListener() {
             @Override
@@ -60,7 +65,7 @@ public class NativeLogTest extends VlcjTest {
                 System.out.printf("%-7s: %s\n", level, message);
             }
         });
-        
+
         mediaPlayerComponent.getMediaPlayer().addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
             @Override
             public void finished(MediaPlayer mediaPlayer) {
@@ -72,12 +77,12 @@ public class NativeLogTest extends VlcjTest {
                 latch.countDown();
             }
         });
-        
+
         mediaPlayerComponent.getMediaPlayer().playMedia(args[0]);
 
         // Wait for finished/error
         latch.await();
-        
+
         // Must release the components to exit (otherwise threads are left running)
         log.release();
         mediaPlayerComponent.release();

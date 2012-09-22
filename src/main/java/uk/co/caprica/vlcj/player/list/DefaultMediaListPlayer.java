@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with VLCJ.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Copyright 2009, 2010, 2011, 2012 Caprica Software Limited.
  */
 
@@ -44,8 +44,6 @@ import uk.co.caprica.vlcj.player.list.events.MediaListPlayerEvent;
 import uk.co.caprica.vlcj.player.list.events.MediaListPlayerEventFactory;
 import uk.co.caprica.vlcj.player.list.events.MediaListPlayerEventType;
 
-import com.sun.jna.CallbackThreadInitializer;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
@@ -112,7 +110,7 @@ public class DefaultMediaListPlayer extends AbstractMediaPlayer implements Media
 
     /**
      * Create a new media list player.
-     * 
+     *
      * @param libvlc native library interface
      * @param instance libvlc instance
      */
@@ -257,7 +255,7 @@ public class DefaultMediaListPlayer extends AbstractMediaPlayer implements Media
     }
 
     /**
-     * 
+     *
      */
     private void createInstance() {
         Logger.debug("createInstance()");
@@ -273,7 +271,7 @@ public class DefaultMediaListPlayer extends AbstractMediaPlayer implements Media
     }
 
     /**
-     * 
+     *
      */
     private void destroyInstance() {
         Logger.debug("destroyInstance()");
@@ -288,19 +286,18 @@ public class DefaultMediaListPlayer extends AbstractMediaPlayer implements Media
             libvlc.libvlc_media_list_player_release(mediaListPlayerInstance);
             Logger.debug("Media list player released");
         }
-        
+
         Logger.debug("Shut down listeners...");
         listenersService.shutdown();
         Logger.debug("Listeners shut down.");
     }
 
     /**
-     * 
+     *
      */
     private void registerEventListener() {
         Logger.debug("registerEventListener()");
         callback = new VlcVideoPlayerCallback();
-        Native.setCallbackThreadInitializer(callback, new CallbackThreadInitializer());
         for(libvlc_event_e event : libvlc_event_e.values()) {
             // The native event manager reports that it does not support
             // libvlc_MediaListPlayerPlayed or libvlc_MediaListPlayerStopped
@@ -313,7 +310,7 @@ public class DefaultMediaListPlayer extends AbstractMediaPlayer implements Media
     }
 
     /**
-     * 
+     *
      */
     private void deregisterEventListener() {
         Logger.debug("deregisterEventListener()");
@@ -363,18 +360,18 @@ public class DefaultMediaListPlayer extends AbstractMediaPlayer implements Media
     }
 
     /**
-     * 
+     *
      */
     private final class NotifyListenersRunnable implements Runnable {
 
         /**
-         * 
+         *
          */
         private final MediaListPlayerEvent mediaListPlayerEvent;
 
         /**
-         * 
-         * 
+         *
+         *
          * @param mediaListPlayerEvent
          */
         private NotifyListenersRunnable(MediaListPlayerEvent mediaListPlayerEvent) {
@@ -417,7 +414,7 @@ public class DefaultMediaListPlayer extends AbstractMediaPlayer implements Media
         }
 
         /**
-         * 
+         *
          */
         private void registerMediaEventListener() {
             Logger.debug("registerMediaEventListener()");
@@ -435,7 +432,7 @@ public class DefaultMediaListPlayer extends AbstractMediaPlayer implements Media
         }
 
         /**
-         * 
+         *
          */
         private void deregisterMediaEventListener() {
             Logger.debug("deregisterMediaEventListener()");
