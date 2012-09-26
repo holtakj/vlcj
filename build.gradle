@@ -1,0 +1,10 @@
+apply plugin: 'idea'
+apply plugin: 'java'
+
+group = 'org.holtak.dfensor.vlcj'
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+    compile 'net.java.dev.jna:jna:3.4.0'
+    compile 'net.java.dev.jna:platform:3.4.0'
+}
